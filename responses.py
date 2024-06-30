@@ -1,4 +1,5 @@
 from random import choice, randint
+from meme_reader import read_memes
 
 def get_response(user_input: str) -> str:
     
@@ -16,8 +17,12 @@ def get_response(user_input: str) -> str:
     elif(lowered=="roll" or lowered=="roll dice" or lowered=="roll the dice"):
         return f"Rolling dice....\n{randint(1,6)}"
     
+    elif(lowered=="meme"):
+        return read_memes()
+    
     else:
         return choice(["I don't understand", 
                        "What are you talking about", 
                        "Do you mind rephrasing that", 
                        "Are you nuts"])
+    

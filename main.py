@@ -1,7 +1,7 @@
 from typing import Final
 import os
 from dotenv import load_dotenv
-from discord import Intents, Client, Message
+from discord import Intents, Client, Message, File
 from responses import get_response
 
 # STEP 0: LOADING OUR TOKEN
@@ -25,10 +25,22 @@ async def send_message(message: Message, user_message: str) -> None:
 
     try:
         response: str = get_response(user_message)
-        if is_private:
-            await message.author.send(response)
+        if response.endswith(".jpg"):
+            meme_path = response
+            if os.path.exists(meme_path):
+                if is_private:
+                    await message.author.send(file=File(meme_path))
+                else:
+                    await message.channel.send(file=File(meme_path))
+            else:
+                print(f"File not found: {meme_path}")
+
         else:
-            await message.channel.send(response)
+            if is_private:
+                await message.author.send(response)
+            else:
+                await message.channel.send(response)
+                
     except Exception as e:
         print(e)
 
