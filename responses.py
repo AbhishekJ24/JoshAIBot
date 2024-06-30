@@ -2,27 +2,32 @@ from random import choice, randint
 from meme_reader import read_memes
 
 def get_response(user_input: str) -> str:
+    cleaned_input = user_input.strip().lower()
     
-    lowered: str = user_input.lower()
-
-    if(lowered==""):
-        return "Why the silence, is it somebody's funeral??"
+    if not cleaned_input:
+        return "Why the silence? Is it somebody's funeral?"
     
-    elif(lowered.startswith("hello")):
-        return "Well, hello there, how do I assist you"
+    if cleaned_input.endswith("?"):
+        return "I'd like to apologize but I am not yet trained on ML models to generate output."
     
-    elif(lowered.startswith("bye") or lowered.startswith("thanks")):
-        return "Happy to assist you, have a great day ahead"
+    greetings = ["hello", "hi", "hey", "greetings", "good morning", "good afternoon", "good evening", "hola", "howdy"]
+    farewells = ["bye", "thanks"]
     
-    elif(lowered=="roll" or lowered=="roll dice" or lowered=="roll the dice"):
-        return f"Rolling dice....\n{randint(1,6)}"
+    for greeting in greetings:
+        if cleaned_input.startswith(greeting):
+            return "Well, hello there, how may I assist you?"
     
-    elif(lowered=="meme"):
-        return read_memes()
+    for farewell in farewells:
+        if cleaned_input.startswith(farewell):
+            return "Happy to assist you, have a great day ahead."
     
-    else:
-        return choice(["I don't understand", 
-                       "What are you talking about", 
-                       "Do you mind rephrasing that", 
-                       "Are you nuts"])
+    if cleaned_input in ["roll", "roll dice", "roll the dice"]:
+        return f"Rolling dice....\n{randint(1, 6)}"
     
+    if cleaned_input == "meme":
+        try:
+            return read_memes()
+        except Exception as e:
+            return f"Error reading memes: {str(e)}"
+    
+    return choice(["I don't understand", "What are you talking about", "Do you mind rephrasing that?", "Are you nuts?"])
