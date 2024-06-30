@@ -1,16 +1,61 @@
-# This is a sample Python script.
+from typing import Final
+import os
+from dotenv import load_dotenv
+from discord import Intents, Client, Message
+from responses import get_response
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+# STEP 0: LOADING OUR TOKEN
+load_dotenv()
+TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
+
+# STEP 1: BOT SETUP
+intents: Intents = Intents.default()
+intents.message_content = True
+client: Client = Client(intents=intents)
+
+# STEP 2: MESSAGE FUNCTIONALITY
+async def send_message(message: Message, user_message: str) -> None:
+    if not user_message:
+        print("(Message was empty because intents were not enabled probably)")
+        return
+    
+    
+    if is_private := user_message[0]=='?':
+        user_message=user_message[1:]
+
+    try:
+        response: str = get_response(user_message)
+        if is_private:
+            await message.author.send(response)
+        else:
+            await message.channel.send(response)
+    except Exception as e:
+        print(e)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+# STEP 3: HANDLING STARTUP FOR BOT
+@client.event
+async def on_ready() -> None:
+    print(f"{client.user} is now working")
 
 
-# Press the green button in the gutter to run the script.
+# STEP 4: HANDLING INCOMING MESSAGES
+@client.event
+async def on_message(message: Message) -> None:
+    if message.author == client.user:
+        return
+    
+    username: str = str(message.author)
+    user_message: str = str(message.content)
+    channel: str = str(message.channel)
+
+    print(f"[{channel}] {username} {user_message}")
+    await send_message(message,user_message)
+
+
+# STEP 5: MAIN ENTRY POINT
+def main() -> None:
+    client.run(token=TOKEN)
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    main()
